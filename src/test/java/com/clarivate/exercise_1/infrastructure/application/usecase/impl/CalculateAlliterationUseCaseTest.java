@@ -1,7 +1,7 @@
 package com.clarivate.exercise_1.infrastructure.application.usecase.impl;
 
-import com.clarivate.exercise_1.infrastructure.application.exceptions.NoInitialConsonantFoundException;
-import com.clarivate.exercise_1.infrastructure.application.usecase.CalculateAlliterationUseCase;
+import com.clarivate.exercise_1.application.exceptions.NoInitialConsonantFoundException;
+import com.clarivate.exercise_1.application.usecase.CalculateAlliterationUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

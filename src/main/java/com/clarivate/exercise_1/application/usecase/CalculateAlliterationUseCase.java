@@ -1,6 +1,6 @@
-package com.clarivate.exercise_1.infrastructure.application.usecase;
+package com.clarivate.exercise_1.application.usecase;
 
-import com.clarivate.exercise_1.infrastructure.application.exceptions.NoInitialConsonantFoundException;
+import com.clarivate.exercise_1.application.exceptions.NoInitialConsonantFoundException;
 
 public interface CalculateAlliterationUseCase {
 
