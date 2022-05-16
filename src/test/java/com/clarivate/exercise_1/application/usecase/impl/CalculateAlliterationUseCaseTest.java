@@ -1,4 +1,4 @@
-package com.clarivate.exercise_1.infrastructure.application.usecase.impl;
+package com.clarivate.exercise_1.application.usecase.impl;
 
 import com.clarivate.exercise_1.application.exceptions.NoInitialConsonantFoundException;
 import com.clarivate.exercise_1.application.usecase.CalculateAlliterationUseCase;
