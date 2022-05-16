@@ -1,4 +1,4 @@
-package com.clarivate.exercise_1.infrastructure.application.exceptions;
+package com.clarivate.exercise_1.application.exceptions;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
