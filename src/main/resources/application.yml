@@ -1,0 +1,11 @@
+spring:
+
+  application:
+    name: clarivate_technical_test
+
+  output:
+    ansi:
+      enabled: always
+
+  profiles:
+    active: dev
