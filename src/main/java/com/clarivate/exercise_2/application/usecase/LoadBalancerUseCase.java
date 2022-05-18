@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface LoadBalancerUseCase {
 
-  boolean main(List<Integer> requests);
+  boolean requestsCanBeBalanced(List<Integer> requests);
 
 }

@@ -16,7 +16,7 @@ public class LoadBalancerUseCaseImpl implements LoadBalancerUseCase {
   private static final int NUM_WORKERS = 3;
 
   @Override
-  public boolean main(List<Integer> input) {
+  public boolean requestsCanBeBalanced(List<Integer> requests) {
 
     if (input.size() <= 5) {
       return false;
