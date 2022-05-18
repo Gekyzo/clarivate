@@ -32,12 +32,12 @@ public class LoadBalancerUseCaseImpl implements LoadBalancerUseCase {
     }
 
     int requestsSum = requests.stream().mapToInt(Integer::intValue).sum();
-    int maxSubsetSum = BigDecimal.valueOf(requestsSum / NUM_WORKERS).setScale(0, RoundingMode.DOWN).intValue();
+    int maxSublistSum = BigDecimal.valueOf(requestsSum / NUM_WORKERS).setScale(0, RoundingMode.DOWN).intValue();
 
-    return this.requestsCanBeBalancedForMaximum(requests, maxSubsetSum);
+    return this.requestsCanBeBalancedForMaximum(requests, maxSublistSum);
   }
 
-  private boolean requestsCanBeBalancedForMaximum(List<Integer> requests, int maxSubsetSum) {
+  private boolean requestsCanBeBalancedForMaximum(List<Integer> requests, int maxSublistSum) {
 
     int sum1 = 0;
     int sum2 = 0;
@@ -48,7 +48,7 @@ public class LoadBalancerUseCaseImpl implements LoadBalancerUseCase {
     List<Integer> list3 = new ArrayList<>();
 
     for (int i = 0; i < requests.size(); i++) {
-      if (sum1 + requests.get(i) <= maxSubsetSum) {
+      if (sum1 + requests.get(i) <= maxSublistSum) {
         sum1 += requests.get(i);
         list1.add(requests.get(i));
       } else {
@@ -65,12 +65,9 @@ public class LoadBalancerUseCaseImpl implements LoadBalancerUseCase {
       }
     }
 
-    if (!Objects.equals(list1.stream().mapToInt(Integer::intValue).sum(), list2.stream().mapToInt(Integer::intValue).sum())) {
-      int index = list1.size() - 1;
-      list1.remove(index);
-      int newMaxSubsetSum = list1.stream().mapToInt(Integer::intValue).sum();
-      if (this.requestsCanBeBalancedForMaximum(requests, newMaxSubsetSum))
-        return true;
+    if (this.checkShouldDoRecursiveCall(list1, list2)) {
+      int newMaxSublistSum = calculateNewMaxSublistSum(list1);
+      return this.requestsCanBeBalancedForMaximum(requests, newMaxSublistSum);
     }
 
     for (int i = list1.size() + list2.size() + 2; i < requests.size(); i++) {
@@ -82,12 +79,9 @@ public class LoadBalancerUseCaseImpl implements LoadBalancerUseCase {
       }
     }
 
-    if (!Objects.equals(list1.stream().mapToInt(Integer::intValue).sum(), list3.stream().mapToInt(Integer::intValue).sum())) {
-      int index = list1.size() - 1;
-      list1.remove(index);
-      int newMaxSubsetSum = list1.stream().mapToInt(Integer::intValue).sum();
-      if (this.requestsCanBeBalancedForMaximum(requests, newMaxSubsetSum))
-        return true;
+    if (this.checkShouldDoRecursiveCall(list1, list3)) {
+      int newMaxSublistSum = calculateNewMaxSublistSum(list1);
+      return this.requestsCanBeBalancedForMaximum(requests, newMaxSublistSum);
     }
 
     boolean listsSizeMatch = requests.size() == list1.size() + list2.size() + list3.size() + NUM_DROPPED;
@@ -95,6 +89,26 @@ public class LoadBalancerUseCaseImpl implements LoadBalancerUseCase {
 
     return listsSizeMatch && listsTimeMatch;
 
+  }
+
+  private boolean checkShouldDoRecursiveCall(List<Integer> listA, List<Integer> listB) {
+
+    return !Objects.equals(listA.stream().mapToInt(Integer::intValue).sum(), listB.stream().mapToInt(Integer::intValue).sum());
+  }
+
+  /**
+   * Calculates the new value of the maximum sublist total.
+   *
+   * @param sublist The sublist obtained from the original request list.
+   * @return int The new maxSublistSum value
+   */
+  private int calculateNewMaxSublistSum(List<Integer> sublist) {
+
+    // Remove last element from the list
+    sublist.remove(sublist.size() - 1);
+
+    // Subtracts the last element value from the total of the list
+    return sublist.stream().mapToInt(Integer::intValue).sum();
   }
 
 }
