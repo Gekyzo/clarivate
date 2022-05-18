@@ -21,17 +21,19 @@ public class LoadBalancerUseCaseImpl implements LoadBalancerUseCase {
   /**
    * Number of requests dropped/avoided by the workers.
    */
-  private static final int NUM_DROPPED = 2;
+  private static final int NUM_REQUESTS_DROPPED = 2;
 
   @Override
   public boolean requestsCanBeBalanced(List<Integer> requests) {
 
     // Guard clause to avoid testing too short lists
-    if (requests.size() <= NUM_WORKERS + NUM_DROPPED) {
+    if (requests.size() <= NUM_WORKERS + NUM_REQUESTS_DROPPED) {
       return false;
     }
 
     int requestsSum = requests.stream().mapToInt(Integer::intValue).sum();
+
+    // Obtain the initial maximum sublist value
     int maxSublistSum = BigDecimal.valueOf(requestsSum / NUM_WORKERS).setScale(0, RoundingMode.DOWN).intValue();
 
     return this.requestsCanBeBalancedForMaximum(requests, maxSublistSum);
@@ -39,61 +41,55 @@ public class LoadBalancerUseCaseImpl implements LoadBalancerUseCase {
 
   private boolean requestsCanBeBalancedForMaximum(List<Integer> requests, int maxSublistSum) {
 
-    int sum1 = 0;
-    int sum2 = 0;
-    int sum3 = 0;
+    int sublistOneSum = 0;
+    int sublistTwoSum = 0;
+    int sublistThreeSum = 0;
 
-    List<Integer> list1 = new ArrayList<>();
-    List<Integer> list2 = new ArrayList<>();
-    List<Integer> list3 = new ArrayList<>();
+    List<Integer> sublistOne = new ArrayList<>();
+    List<Integer> sublistTwo = new ArrayList<>();
+    List<Integer> sublistThree = new ArrayList<>();
 
-    for (int i = 0; i < requests.size(); i++) {
-      if (sum1 + requests.get(i) <= maxSublistSum) {
-        sum1 += requests.get(i);
-        list1.add(requests.get(i));
-      } else {
-        break;
-      }
+    sublistOneSum = getSublistOneSum(0, requests, maxSublistSum, sublistOneSum, sublistOne);
+    sublistTwoSum = getSublistOneSum(sublistOne.size() + 1, requests, sublistOneSum, sublistTwoSum, sublistTwo);
+    sublistThreeSum = getSublistOneSum(sublistOne.size() + sublistTwo.size() + 2, requests, sublistOneSum, sublistThreeSum, sublistThree);
+
+    if (checkShouldDoRecursiveCall(sublistOne, sublistTwo, sublistThree)) {
+      int newMaxSublistSum = calculateNewMaxSublistSum(sublistOne);
+      return requestsCanBeBalancedForMaximum(requests, newMaxSublistSum);
     }
 
-    for (int i = list1.size() + 1; i < requests.size(); i++) {
-      if (sum2 + requests.get(i) <= sum1) {
-        sum2 += requests.get(i);
-        list2.add(requests.get(i));
-      } else {
-        break;
-      }
-    }
-
-    if (this.checkShouldDoRecursiveCall(list1, list2)) {
-      int newMaxSublistSum = calculateNewMaxSublistSum(list1);
-      return this.requestsCanBeBalancedForMaximum(requests, newMaxSublistSum);
-    }
-
-    for (int i = list1.size() + list2.size() + 2; i < requests.size(); i++) {
-      if (sum3 + requests.get(i) <= sum1) {
-        sum3 += requests.get(i);
-        list3.add(requests.get(i));
-      } else {
-        break;
-      }
-    }
-
-    if (this.checkShouldDoRecursiveCall(list1, list3)) {
-      int newMaxSublistSum = calculateNewMaxSublistSum(list1);
-      return this.requestsCanBeBalancedForMaximum(requests, newMaxSublistSum);
-    }
-
-    boolean listsSizeMatch = requests.size() == list1.size() + list2.size() + list3.size() + NUM_DROPPED;
-    boolean listsTimeMatch = Stream.of(sum1, sum2, sum3).distinct().count() == 1;
+    boolean listsSizeMatch = requests.size() == sublistOne.size() + sublistTwo.size() + sublistThree.size() + NUM_REQUESTS_DROPPED;
+    boolean listsTimeMatch = Stream.of(sublistOneSum, sublistTwoSum, sublistThreeSum).distinct().count() == 1;
 
     return listsSizeMatch && listsTimeMatch;
-
   }
 
-  private boolean checkShouldDoRecursiveCall(List<Integer> listA, List<Integer> listB) {
+  private int getSublistOneSum(int index, List<Integer> requests, int maxSublistSum, int sublistOneSum, List<Integer> sublistOne) {
 
-    return !Objects.equals(listA.stream().mapToInt(Integer::intValue).sum(), listB.stream().mapToInt(Integer::intValue).sum());
+    for (int i = index; i < requests.size(); i++) {
+      int currentRequest = requests.get(i);
+      if (sublistOneSum + currentRequest <= maxSublistSum) {
+        sublistOneSum += currentRequest;
+        sublistOne.add(currentRequest);
+      } else {
+        break;
+      }
+    }
+    return sublistOneSum;
+  }
+
+  /**
+   * Indicates whether the method should be called recursively by comparing the sums of the sublists.
+   *
+   * @param sublistA THe first sublist.
+   * @param sublistB THe second  sublist.
+   * @param sublistC THe third sublist.
+   * @return True if the sum of the lists don't match. False otherwise.
+   */
+  private boolean checkShouldDoRecursiveCall(List<Integer> sublistA, List<Integer> sublistB, List<Integer> sublistC) {
+
+    return !Objects.equals(sublistA.stream().mapToInt(Integer::intValue).sum(), sublistB.stream().mapToInt(Integer::intValue).sum())
+        || !Objects.equals(sublistA.stream().mapToInt(Integer::intValue).sum(), sublistC.stream().mapToInt(Integer::intValue).sum());
   }
 
   /**
