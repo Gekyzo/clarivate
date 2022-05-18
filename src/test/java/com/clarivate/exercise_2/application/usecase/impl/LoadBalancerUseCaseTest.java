@@ -23,7 +23,7 @@ class LoadBalancerUseCaseTest {
 
     List<Integer> requests = List.of(1, 3, 4, 2, 2, 2, 1, 1, 2);
 
-    assertTrue(useCase.test(requests));
+    assertTrue(useCase.main(requests));
   }
 
   @Test
@@ -32,7 +32,7 @@ class LoadBalancerUseCaseTest {
 
     List<Integer> requests = List.of(2, 1, 1, 2, 2, 2, 4, 3, 1);
 
-    assertTrue(useCase.test(requests));
+    assertTrue(useCase.main(requests));
   }
 
   @Test
@@ -41,7 +41,16 @@ class LoadBalancerUseCaseTest {
 
     List<Integer> requests = List.of(1, 1, 1, 1, 1, 1, 1, 1);
 
-    assertTrue(useCase.test(requests));
+    assertTrue(useCase.main(requests));
+  }
+
+  @Test
+  @DisplayName("Method returns true #4")
+  void method_returns_true_four() {
+
+    List<Integer> requests = List.of(0, 0, 1, 0, 0, 1, 0, 0);
+
+    assertTrue(useCase.main(requests));
   }
 
   @Test
@@ -50,7 +59,7 @@ class LoadBalancerUseCaseTest {
 
     List<Integer> requests = List.of(1, 1, 1, 1, 1, 1);
 
-    assertFalse(useCase.test(requests));
+    assertFalse(useCase.main(requests));
   }
 
 }
