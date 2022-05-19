@@ -13,7 +13,7 @@ public class NoInitialConsonantFoundException extends Exception {
 
   public NoInitialConsonantFoundException(String phrase) {
 
-    super(MessageFormat.format("The phrase \"{0}\" doesn''t any word that begins with consonant", phrase));
+    super(MessageFormat.format("The phrase \"{0}\" doesn''t contain any word that begins with consonant", phrase));
 
   }
 
