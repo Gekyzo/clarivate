@@ -4,57 +4,50 @@ import com.clarivate.exercise_1.application.exceptions.NoInitialConsonantFoundEx
 import com.clarivate.exercise_1.application.usecase.CalculateAlliterationUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.text.MessageFormat;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-// TODO: use dataprovider
 class CalculateAlliterationUseCaseTest {
 
   @Autowired
   private CalculateAlliterationUseCase useCase;
 
-  @Test
-  @DisplayName("Method returns correct calculatePercentage for text #1")
-  void method_returns_correct_count_text_1() throws NoInitialConsonantFoundException {
+  /**
+   * List of datasets to perform the tests.
+   * <p>Each dataset is made up of the input phrase and the expected alliteration percentage for that phrase.</p>
+   *
+   * @return Stream
+   */
+  private static Stream<Arguments> sampleTexts() {
 
-    String phrase = "Mike made mellow music with his new microphone.";
-    double expectedValue = 0.63d;
+    return Stream.of(
+        Arguments.of("Mike made mellow music with his new microphone.", 'm', 0.63d),
+        Arguments.of("Yarvis yanked his ankle at yoga, and Yolanda yelled out in surprise.", 'y', 0.42d)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("sampleTexts")
+  @DisplayName("Method returns correct alliteration percentage")
+  void method_returns_correct_alliteration_percentage(String phrase, char expectedChar, double expectedValue) throws NoInitialConsonantFoundException {
 
     assertEquals(expectedValue, useCase.calculatePercentage(phrase));
   }
 
-  @Test
-  @DisplayName("Method returns correct calculatePercentage for text #1")
-  void method_returns_correct_count_text_2() throws NoInitialConsonantFoundException {
-
-    String phrase = "Yarvis yanked his ankle at yoga, and Yolanda yelled out in surprise.";
-    double expectedValue = 0.42d;
-
-    assertEquals(expectedValue, useCase.calculatePercentage(phrase));
-  }
-
-  @Test
-  @DisplayName("Method returns correct initial consonant for text #1")
-  void method_returns_correct_initial_consonant_one() throws NoInitialConsonantFoundException {
-
-    String phrase = "Mike made mellow music with his new microphone.";
-    char expectedChar = 'm';
-
-    assertEquals(expectedChar, useCase.getCountableConsonant(phrase));
-  }
-
-  @Test
-  @DisplayName("Method returns correct initial consonant for text #2")
-  void method_returns_correct_initial_consonant_two() throws NoInitialConsonantFoundException {
-
-    String phrase = "Yarvis yanked his ankle at yoga, and Yolanda yelled out in surprise.";
-    char expectedChar = 'y';
+  @ParameterizedTest
+  @MethodSource("sampleTexts")
+  @DisplayName("Method returns correct countable consonant")
+  void method_returns_correct_countable_consonant(String phrase, char expectedChar, double expectedValue) throws NoInitialConsonantFoundException {
 
     assertEquals(expectedChar, useCase.getCountableConsonant(phrase));
   }
