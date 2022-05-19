@@ -31,7 +31,9 @@ class CalculateAlliterationUseCaseTest {
 
     return Stream.of(
         Arguments.of("Mike made mellow music with his new microphone.", 0.63d),
-        Arguments.of("Yarvis yanked his ankle at yoga, and Yolanda yelled out in surprise.", 0.42d)
+        Arguments.of("Yarvis yanked his ankle at yoga, and Yolanda yelled out in surprise.", 0.42d),
+        Arguments.of("áaaaa áaaaa áaaaa bbb", 0.25d),
+        Arguments.of("áaaaa éeeee ìiiiiii bbb", 0.25d)
     );
   }
 
