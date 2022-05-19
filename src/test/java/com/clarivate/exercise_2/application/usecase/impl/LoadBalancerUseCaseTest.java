@@ -25,7 +25,7 @@ class LoadBalancerUseCaseTest {
    *
    * @return Stream<Arguments>
    */
-  private static Stream<Arguments> sampleRequestList() {
+  private static Stream<Arguments> listOfRequestsAndExpectedResult() {
 
     return Stream.of(
         // Should return true lists
@@ -41,7 +41,7 @@ class LoadBalancerUseCaseTest {
   }
 
   @ParameterizedTest
-  @MethodSource("sampleRequestList")
+  @MethodSource("listOfRequestsAndExpectedResult")
   @DisplayName("Request can be balanced or not")
   void check_requests_can_be_balanced(List<Integer> requests, boolean expectedResult) {
 
