@@ -2,6 +2,7 @@ package com.clarivate.exercise_1.application.usecase.impl;
 
 import com.clarivate.exercise_1.application.exceptions.NoInitialConsonantFoundException;
 import com.clarivate.exercise_1.application.usecase.CalculateAlliterationUseCase;
+import com.clarivate.shared.CharUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,7 +19,7 @@ public class CalculateAlliterationUseCaseImpl implements CalculateAlliterationUs
   @Override
   public double calculatePercentage(String phrase) throws NoInitialConsonantFoundException {
 
-    List<String> phraseWords = this.splitPhrase(phrase);
+    List<String> phraseWords = List.of(phrase.split(WHITESPACE_CHAR));
     char countableConsonant = this.getCountableConsonant(phrase);
     long totalAlliterationWords = phraseWords.stream().filter(s -> s.toLowerCase().startsWith(String.valueOf(countableConsonant))).count();
 
@@ -27,25 +28,17 @@ public class CalculateAlliterationUseCaseImpl implements CalculateAlliterationUs
     return BigDecimal.valueOf(percentage).setScale(2, RoundingMode.HALF_UP).doubleValue();
   }
 
-  // TODO: improve split
-  private List<String> splitPhrase(String phrase) {
-
-    return List.of(phrase.split(WHITESPACE_CHAR));
-  }
-
-
   @Override
   public char getCountableConsonant(String phrase) throws NoInitialConsonantFoundException {
 
-    List<String> phraseWords = this.splitPhrase(phrase);
+    List<String> phraseWords = List.of(phrase.split(WHITESPACE_CHAR));
     Map<String, Integer> firstLetters = new HashMap<>();
-    String[] vowels = new String[]{"a", "e", "i", "o", "u"};
 
     for (String word : phraseWords) {
       String firstChar = String.valueOf(word.charAt(0)).toLowerCase();
 
-      // Check if letter is consonant
-      if (List.of(vowels).contains(firstChar)) {
+      // If the first letter of the word is a vowel, skip from iteration
+      if (CharUtils.isVowel(word.charAt(0))) {
         continue;
       }
 
