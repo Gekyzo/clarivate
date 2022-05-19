@@ -27,7 +27,7 @@ public class LoadBalancerUseCaseImpl implements LoadBalancerUseCase {
   public boolean requestsCanBeBalanced(List<Integer> requests) {
 
     // Guard clause to avoid testing too short lists
-    if (requests.size() <= NUM_WORKERS + NUM_REQUESTS_DROPPED) {
+    if (requestIsTooShort(requests.size())) {
       return false;
     }
 
@@ -35,6 +35,17 @@ public class LoadBalancerUseCaseImpl implements LoadBalancerUseCase {
     int maxSublistSum = BigDecimal.valueOf(requestsSum / NUM_WORKERS).setScale(0, RoundingMode.DOWN).intValue();
 
     return this.requestsCanBeBalancedForMaximum(requests, maxSublistSum);
+  }
+
+  /**
+   * Checks whether the request list is long enough to be balanced or not.
+   *
+   * @param requestSize The size of the request input list.
+   * @return True if the request size is too short to be balanced.
+   */
+  private boolean requestIsTooShort(int requestSize) {
+
+    return requestSize <= NUM_WORKERS + NUM_REQUESTS_DROPPED;
   }
 
   private boolean requestsCanBeBalancedForMaximum(List<Integer> requests, int maxSublistSum) {
@@ -84,9 +95,9 @@ public class LoadBalancerUseCaseImpl implements LoadBalancerUseCase {
   /**
    * Indicates whether the method should be called recursively by comparing the sums of the sublists.
    *
-   * @param sublistA THe first sublist.
-   * @param sublistB THe second  sublist.
-   * @param sublistC THe third sublist.
+   * @param sublistA The first sublist.
+   * @param sublistB The second  sublist.
+   * @param sublistC The third sublist.
    * @return True if the sum of the lists don't match. False otherwise.
    */
   private boolean checkShouldDoRecursiveCall(List<Integer> sublistA, List<Integer> sublistB, List<Integer> sublistC) {
